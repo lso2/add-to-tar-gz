@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 echo =========================================
-echo Add to tar.gz - Enhanced Installer v1.3.0
+echo Add to tar.gz - Enhanced Installer v1.3.2
 echo =========================================
 echo.
 
@@ -33,7 +33,7 @@ set "CREATE_SCRIPT=%INSTALL_DIR%\CreateTarGz.bat"
 set "UNINSTALL_SCRIPT=%INSTALL_DIR%\uninstall.bat"
 
 :: Check for existing installation and offer to update
-if exist "%INSTALL_DIR%" (
+if exist "%INSTALL_DIR%\uninstall.bat" (
     echo.
     echo Existing installation detected in %INSTALL_DIR%
     echo.
@@ -44,7 +44,7 @@ if exist "%INSTALL_DIR%" (
     )
     echo.
     echo Removing existing installation...
-    call "%UNINSTALL_SCRIPT%" silent >nul 2>&1
+    call "%INSTALL_DIR%\uninstall.bat" silent >nul 2>&1
     timeout /t 2 /nobreak >nul
 )
 
@@ -119,10 +119,10 @@ if exist "%SCRIPT_DIR%\dll\targz_context.dll" (
             set "CLSID={A1B2C3D4-E5F6-7890-ABCD-EF123456789A}"
             
             :: Register for .tar.gz files
-            reg add "HKCR\SystemFileAssociations\.tar.gz\shellex\ContextMenuHandlers\TarGzExtract" /ve /t REG_SZ /d "!CLSID!" /f >nul 2>&1
+            reg add "HKCR\SystemFileAssociations\.tar.gz\shellex\ContextMenuHandlers\TarGzExtract" /ve /t REG_SZ /d "{A1B2C3D4-E5F6-7890-ABCD-EF123456789A}" /f >nul 2>&1
             
             :: Register for .tgz files
-            reg add "HKCR\SystemFileAssociations\.tgz\shellex\ContextMenuHandlers\TarGzExtract" /ve /t REG_SZ /d "!CLSID!" /f >nul 2>&1
+            reg add "HKCR\SystemFileAssociations\.tgz\shellex\ContextMenuHandlers\TarGzExtract" /ve /t REG_SZ /d "{A1B2C3D4-E5F6-7890-ABCD-EF123456789A}" /f >nul 2>&1
             
             :: Store configuration in registry
             reg add "HKLM\SOFTWARE\AddToTarGz" /v "ScriptPath" /t REG_SZ /d "%EXTRACT_SCRIPT%" /f >nul 2>&1
@@ -130,6 +130,13 @@ if exist "%SCRIPT_DIR%\dll\targz_context.dll" (
             reg add "HKLM\SOFTWARE\AddToTarGz" /v "Extension" /t REG_SZ /d "%EXTENSION%" /f >nul 2>&1
             echo Dynamic menus installed - will show "Extract %EXTENSION% to folder/"
             set "DLL_INSTALLED=1"
+        ) else (
+            echo DLL registration failed, running reregister script...
+            call "%SCRIPT_DIR%\utils\reregister_working_dll.bat" silent
+            if not errorlevel 1 (
+                set "DLL_INSTALLED=1"
+                echo DLL successfully re-registered
+            )
         )
     )
 )
@@ -175,14 +182,16 @@ reg add "HKCR\Directory\shell\%MENU_KEY%\command" /ve /t REG_SZ /d "\"%CREATE_SC
 
 if "%DLL_INSTALLED%"=="1" goto INSTALL_DONE
 
-:: Only install registry extraction if DLL failed to install
-echo Installing fallback extraction menus (DLL not available)...
-reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+:: Always install static extraction menus with Position=Top for better positioning
+echo Installing static registry-based extraction menus with top positioning...
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract here" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /v "Position" /t REG_SZ /d "Top" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
 
-reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract here" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /v "Position" /t REG_SZ /d "Top" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
 
 goto INSTALL_DONE
@@ -209,19 +218,30 @@ reg add "HKCR\Directory\shell\%MENU_KEY%\command" /ve /t REG_SZ /d "\"%CREATE_SC
 goto INSTALL_DONE
 
 :EXTRACT_ONLY
-if "%DLL_INSTALLED%"=="1" goto INSTALL_DONE
+echo Installing static registry-based extraction menus with top positioning...
 
-echo Installing extraction only (using registry fallback)...
-
-reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract here" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /v "Position" /t REG_SZ /d "Top" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
 
-reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract here" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /v "Position" /t REG_SZ /d "Top" /f >nul 2>&1
 reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
 
 :INSTALL_DONE
+
+:: Always run the reregister script to ensure proper DLL setup (like main installer)
+echo.
+echo Running reregister script to ensure DLL is properly configured...
+call "%SCRIPT_DIR%\utils\reregister_working_dll.bat" silent
+if not errorlevel 1 (
+    echo DLL configuration completed successfully
+) else (
+    echo Warning: DLL configuration may have issues
+)
+
 echo.
 echo =========================================
 echo Installation complete!
@@ -330,7 +350,7 @@ set "output_file=%~1"
 (
 echo @echo off
 echo echo =========================================
-echo echo Add to tar.gz - Uninstaller v1.3.0
+echo echo Add to tar.gz - Uninstaller v1.3.2
 echo echo =========================================
 echo echo.
 echo.

@@ -12,12 +12,12 @@ A simple Windows context menu extension that adds "Add to tar.gz" functionality 
 2. **Install 7-Zip** from https://www.7-zip.org/ (required for compression/extraction)
 3. **Right-click** `INSTALL.bat` → **"Run as administrator"**
 4. **Right-click any non-tar file/folder** → **"Add to tar.gz"** ✓
-5. **Right-click any .tar.gz/.tgz file** → **"Extract here"** ✓
+5. **Right-click any .tar.gz/.tgz file** → **"Extract here"** ✓ (appears at top of menu)
 
 ## ✨ Features
 
 - **One-Click Compression** - Right-click any file or folder to create a tar.gz archive instantly
-- **Extract Support** - Right-click tar.gz or tgz files to extract them to the current directory
+- **Extract Support** - Right-click tar.gz or tgz files to extract them to the current directory (menu appears at top)
 - **Native Integration** - Seamlessly integrates with Windows Explorer context menu
 - **Custom Icon** - Professional tgz icon for easy visual identification
 - **Automatic Cleanup** - Removes intermediate .tar files after creating .tar.gz
@@ -108,7 +108,7 @@ add-to-tar-gz/
 
 ### Extract Archives
 1. Right-click any .tar.gz or .tgz file
-2. Select "Extract here"
+2. Select "Extract here" (appears at top of context menu)
 3. Contents will be extracted to the current directory
 
 ## ⚙️ Configuration
@@ -167,9 +167,11 @@ For advanced users, PowerShell scripts are available in the `powershell` folder 
 ## 🔄 Changelog
 
 ### v1.3.2 - Current Release
-- 🔧 **Enhanced**: Automatic DLL re-registration built into installer
-- 🎯 **Fixed**: Extract context menu moved to top section for better visibility
+- 🔧 **Enhanced**: Automatic DLL re-registration built into installer and wizard
+- 🎯 **Fixed**: Extract context menu positioned at top using static registry entries with Position=Top
 - 🚀 **Improved**: One-click installation handles DLL registration automatically
+- 🛠️ **Fixed**: Install wizard now properly detects existing installations and calls reregister script
+- 📄 **Updated**: Enhanced documentation with 7-Zip requirements throughout
 
 ### v1.3.1 - Previous Release
 - 🐛 **Fixed**: Minor improvements
