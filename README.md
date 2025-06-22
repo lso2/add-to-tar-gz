@@ -1,15 +1,15 @@
-# Windows Add to tar.gz Context Menu
+# "Add to tar.gz" Windows Context Menu
 
 ![Windows](https://img.shields.io/badge/Windows-10%2B-blue.svg)
 ![Version](https://img.shields.io/badge/Version-1.3.2-green.svg)
 ![License](https://img.shields.io/badge/License-GPLv3-orange.svg)
 
-A simple Windows context menu extension that adds "Add to tar.gz" functionality for files and folders, plus extraction support for tar.gz and tgz files. Requires 7-Zip for compression/extraction operations.
+A simple Windows context menu extension that adds "Add to tar.gz" functionality for files and folders, plus extraction support for tar.gz and tgz files. Requires 7-Zip for compression.
 
 ## 🚀 Quick Start
 
 1. **Download/Clone** this repository
-2. **Install 7-Zip** from https://www.7-zip.org/ (required for compression/extraction)
+2. **Install 7-Zip** from https://www.7-zip.org/ (required for compression)
 3. **Right-click** `INSTALL.bat` → **"Run as administrator"**
 4. **Right-click any non-tar file/folder** → **"Add to tar.gz"** ✓
 5. **Right-click any .tar.gz/.tgz file** → **"Extract here"** ✓ (appears at top of menu)
@@ -26,7 +26,7 @@ A simple Windows context menu extension that adds "Add to tar.gz" functionality 
 ## 📋 Requirements
 
 - Windows 10 or higher
-- 7-Zip installed (for compression/extraction functionality)
+- 7-Zip installed (for compression functionality)
   - Download from: https://www.7-zip.org/
 
 ## 🔧 Installation
