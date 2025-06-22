@@ -2,9 +2,7 @@
 
 ![Windows](https://img.shields.io/badge/Windows-10%2B-blue.svg)
 ![Version](https://img.shields.io/badge/Version-1.3.2-green.svg)
-
-**Version:** 1.3.2 
-**License:** GPLv3
+![License](https://img.shields.io/badge/License-GPLv3-orange.svg)
 
 A simple Windows context menu extension that adds "Add to tar.gz" functionality for files and folders, plus extraction support for tar.gz and tgz files.
 
