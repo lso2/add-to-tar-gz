@@ -204,6 +204,25 @@ For advanced users, PowerShell scripts are available in the `powershell` folder 
 
 ---
 
+## 💖 Support This Project
+
+If this tool has saved you time and made your WordPress development workflow smoother, consider supporting its continued development!
+
+**Buy me a coffee!**
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://techreader.com/ko-fi)
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/ncp/payment/8VLYCGR6SM6A4)
+
+**Why donate?**
+- ☕ Fuel more late-night coding sessions
+- 🚀 Support new features and improvements  
+- 🐛 Faster bug fixes and updates
+- 📚 Better documentation and tutorials
+
+**Even small contributions make a big difference!** Every coffee helps keep this project actively maintained and growing.
+
+---
+
 **⭐ If this tool saved you time, please star the repository!**
 
 *Made with ❤️ for the Windows power user community*
