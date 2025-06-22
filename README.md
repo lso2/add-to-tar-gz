@@ -4,14 +4,15 @@
 ![Version](https://img.shields.io/badge/Version-1.3.2-green.svg)
 ![License](https://img.shields.io/badge/License-GPLv3-orange.svg)
 
-A simple Windows context menu extension that adds "Add to tar.gz" functionality for files and folders, plus extraction support for tar.gz and tgz files.
+A simple Windows context menu extension that adds "Add to tar.gz" functionality for files and folders, plus extraction support for tar.gz and tgz files. Requires 7-Zip for compression/extraction operations.
 
 ## 🚀 Quick Start
 
 1. **Download/Clone** this repository
-2. **Right-click** `INSTALL.bat` → **"Run as administrator"**
-3. **Right-click any non-tar file/folder** → **"Add to tar.gz"** ✓
-4. **Right-click any .tar.gz/.tgz file** → **"Extract to folder/"** ✓
+2. **Install 7-Zip** from https://www.7-zip.org/ (required for compression/extraction)
+3. **Right-click** `INSTALL.bat` → **"Run as administrator"**
+4. **Right-click any non-tar file/folder** → **"Add to tar.gz"** ✓
+5. **Right-click any .tar.gz/.tgz file** → **"Extract here"** ✓
 
 ## ✨ Features
 
@@ -25,14 +26,17 @@ A simple Windows context menu extension that adds "Add to tar.gz" functionality 
 ## 📋 Requirements
 
 - Windows 10 or higher
+- 7-Zip installed (for compression/extraction functionality)
+  - Download from: https://www.7-zip.org/
 
 ## 🔧 Installation
 
 ### Quick Installation (Recommended)
 1. **Clone or Download** this repository
-2. **Right-click on `INSTALL.bat`** and select "Run as administrator"
-3. **Installation runs silently** - installs with .tar.gz extension by default
-4. **Done!** Source folder can now be safely deleted
+2. **Install 7-Zip** from https://www.7-zip.org/ if not already installed
+3. **Right-click on `INSTALL.bat`** and select "Run as administrator"
+4. **Installation runs silently** - installs with .tar.gz extension by default
+5. **Done!** Source folder can now be safely deleted
 
 ### Interactive Installation (Advanced)
 1. **Navigate to `scripts/`** folder
@@ -133,6 +137,11 @@ For advanced users, PowerShell scripts are available in the `powershell` folder 
 2. Delete the script files
 
 ## 🐛 Troubleshooting
+
+### 7-Zip Not Found
+- **Solution:** Install 7-Zip from https://www.7-zip.org/
+- The scripts require 7-Zip to be installed in the default location
+- Supports both Program Files and Program Files (x86) installations
 
 ### "Error accessing the registry" during installation
 - **Solution:** Right-click `INSTALL.bat` and select "Run as administrator"
