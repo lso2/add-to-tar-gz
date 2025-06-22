@@ -1,0 +1,24 @@
+Windows Registry Editor Version 5.00
+
+; =====================================================
+; Add to tar.gz - Compression Only
+; Adds only compression context menu entries
+; =====================================================
+
+; --- Compression: Files ---
+[HKEY_CLASSES_ROOT\*\shell\AddToTarGz]
+@="Add to tar.gz"
+"Icon"="ICON_PATH_PLACEHOLDER"
+"Position"="Top"
+
+[HKEY_CLASSES_ROOT\*\shell\AddToTarGz\command]
+@="\"C:\\Path\\To\\scripts\\core\\CreateTarGz.bat\" \"%1\""
+
+; --- Compression: Folders ---
+[HKEY_CLASSES_ROOT\Directory\shell\AddToTarGz]
+@="Add to tar.gz"
+"Icon"="ICON_PATH_PLACEHOLDER"
+"Position"="Top"
+
+[HKEY_CLASSES_ROOT\Directory\shell\AddToTarGz\command]
+@="\"C:\\Path\\To\\scripts\\core\\CreateTarGz.bat\" \"%1\""

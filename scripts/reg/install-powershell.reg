@@ -1,0 +1,40 @@
+Windows Registry Editor Version 5.00
+
+; =====================================================
+; Add to tar.gz - PowerShell Version
+; Uses PowerShell scripts instead of batch files
+; =====================================================
+
+; --- Compression: Files ---
+[HKEY_CLASSES_ROOT\*\shell\AddToTarGzPS]
+@="Add to tar.gz (PowerShell)"
+"Icon"="ICON_PATH_PLACEHOLDER"
+"Position"="Top"
+
+[HKEY_CLASSES_ROOT\*\shell\AddToTarGzPS\command]
+@="powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\Path\\To\\powershell\\CreateTarGz.ps1\" \"%1\""
+
+; --- Compression: Folders ---
+[HKEY_CLASSES_ROOT\Directory\shell\AddToTarGzPS]
+@="Add to tar.gz (PowerShell)"
+"Icon"="ICON_PATH_PLACEHOLDER"
+"Position"="Top"
+
+[HKEY_CLASSES_ROOT\Directory\shell\AddToTarGzPS\command]
+@="powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\Path\\To\\powershell\\CreateTarGz.ps1\" \"%1\""
+
+; --- Extraction: tar.gz ---
+[HKEY_CLASSES_ROOT\targzfile\shell\extractPS]
+@="Extract here (PowerShell)"
+"Icon"="ICON_PATH_PLACEHOLDER"
+
+[HKEY_CLASSES_ROOT\targzfile\shell\extractPS\command]
+@="powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\Path\\To\\powershell\\ExtractTarGz.ps1\" \"%1\""
+
+; --- Extraction: tgz ---
+[HKEY_CLASSES_ROOT\tgzfile\shell\extractPS]
+@="Extract here (PowerShell)"
+"Icon"="ICON_PATH_PLACEHOLDER"
+
+[HKEY_CLASSES_ROOT\tgzfile\shell\extractPS\command]
+@="powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\\Path\\To\\powershell\\ExtractTarGz.ps1\" \"%1\""

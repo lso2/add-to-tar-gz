@@ -1,0 +1,390 @@
+@echo off
+setlocal enabledelayedexpansion
+echo =========================================
+echo Add to tar.gz - Enhanced Installer v1.3.0
+echo =========================================
+echo.
+
+:: Check if running as Administrator
+net session >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: This installer must be run as Administrator.
+    echo.
+    echo Please:
+    echo 1. Right-click on install-wizard.bat
+    echo 2. Select "Run as administrator"
+    echo.
+    pause
+    exit /b 1
+)
+
+echo Running with Administrator privileges... OK
+echo.
+
+:: Get current directory
+set "SCRIPT_DIR=%~dp0"
+set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
+
+:: Set installation destination in ProgramData
+set "INSTALL_DIR=%ProgramData%\AddToTarGz"
+set "ICON_PATH=%INSTALL_DIR%\tgz.ico"
+set "EXTRACT_SCRIPT=%INSTALL_DIR%\ExtractTarGz.bat"
+set "CREATE_SCRIPT=%INSTALL_DIR%\CreateTarGz.bat"
+set "UNINSTALL_SCRIPT=%INSTALL_DIR%\uninstall.bat"
+
+:: Check for existing installation and offer to update
+if exist "%INSTALL_DIR%" (
+    echo.
+    echo Existing installation detected in %INSTALL_DIR%
+    echo.
+    choice /C YN /M "Update existing installation"
+    if errorlevel 2 (
+        echo Installation cancelled.
+        exit /b 0
+    )
+    echo.
+    echo Removing existing installation...
+    call "%UNINSTALL_SCRIPT%" silent >nul 2>&1
+    timeout /t 2 /nobreak >nul
+)
+
+:: Display extension choice
+echo Choose the compression extension for context menu:
+echo.
+echo 1. .tar.gz (recommended for Linux compatibility)
+echo 2. .tgz (shorter extension)
+echo.
+
+choice /C 12 /M "Select extension"
+set "EXT_CHOICE=%errorlevel%"
+
+if "%EXT_CHOICE%"=="1" (
+    set "EXTENSION=tar.gz"
+    set "MENU_TEXT=Add to tar.gz"
+) else (
+    set "EXTENSION=tgz"
+    set "MENU_TEXT=Add to tgz"
+)
+
+echo Selected extension: .%EXTENSION%
+echo.
+
+:: Display installation options
+echo Installation options:
+echo.
+echo 1. Full installation (compression + extraction)
+echo 2. Compression only
+echo 3. Extraction only
+echo 4. Exit
+echo.
+
+choice /C 1234 /M "Select installation type"
+set "INSTALL_CHOICE=%errorlevel%"
+
+if "%INSTALL_CHOICE%"=="4" (
+    echo Installation cancelled.
+    exit /b 0
+)
+
+:: Create installation directory
+echo Creating installation directory...
+if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%" 2>nul
+
+:: Copy essential files to ProgramData
+echo Copying files to %INSTALL_DIR%...
+copy /Y "%SCRIPT_DIR%\..\icon\tgz.ico" "%ICON_PATH%" >nul 2>&1
+copy /Y "%SCRIPT_DIR%\core\ExtractTarGz.bat" "%EXTRACT_SCRIPT%" >nul 2>&1
+
+:: Create the compression script with selected extension
+echo Creating compression script for .%EXTENSION%...
+call :CREATE_COMPRESSION_SCRIPT "%CREATE_SCRIPT%" "%EXTENSION%"
+
+:: Create uninstall script
+echo Creating uninstall script...
+call :CREATE_UNINSTALL_SCRIPT "%UNINSTALL_SCRIPT%"
+
+:: Check if pre-compiled DLL exists and install it
+set "DLL_INSTALLED=0"
+if exist "%SCRIPT_DIR%\dll\targz_context.dll" (
+    echo Installing dynamic context menu DLL...
+    
+    copy /Y "%SCRIPT_DIR%\dll\targz_context.dll" "%WINDIR%\System32\" >nul 2>&1
+    if not errorlevel 1 (
+        echo Registering DLL COM object...
+        regsvr32 /s "%WINDIR%\System32\targz_context.dll" >nul 2>&1
+        if not errorlevel 1 (
+            echo Manually registering shell extension entries...
+            
+            :: Get the CLSID from the DLL and register shell extension manually
+            set "CLSID={A1B2C3D4-E5F6-7890-ABCD-EF123456789A}"
+            
+            :: Register for .tar.gz files
+            reg add "HKCR\SystemFileAssociations\.tar.gz\shellex\ContextMenuHandlers\TarGzExtract" /ve /t REG_SZ /d "!CLSID!" /f >nul 2>&1
+            
+            :: Register for .tgz files
+            reg add "HKCR\SystemFileAssociations\.tgz\shellex\ContextMenuHandlers\TarGzExtract" /ve /t REG_SZ /d "!CLSID!" /f >nul 2>&1
+            
+            :: Store configuration in registry
+            reg add "HKLM\SOFTWARE\AddToTarGz" /v "ScriptPath" /t REG_SZ /d "%EXTRACT_SCRIPT%" /f >nul 2>&1
+            reg add "HKLM\SOFTWARE\AddToTarGz" /v "IconPath" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+            reg add "HKLM\SOFTWARE\AddToTarGz" /v "Extension" /t REG_SZ /d "%EXTENSION%" /f >nul 2>&1
+            echo Dynamic menus installed - will show "Extract %EXTENSION% to folder/"
+            set "DLL_INSTALLED=1"
+        )
+    )
+)
+
+if "%DLL_INSTALLED%"=="0" (
+    echo Using registry-based menus
+)
+
+:: Clean up any existing entries first
+echo Cleaning up any existing registry entries...
+reg delete "HKCR\*\shell\AddToTarGz" /f >nul 2>&1
+reg delete "HKCR\*\shell\AddToTgz" /f >nul 2>&1
+reg delete "HKCR\Directory\shell\AddToTarGz" /f >nul 2>&1
+reg delete "HKCR\Directory\shell\AddToTgz" /f >nul 2>&1
+reg delete "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /f >nul 2>&1
+reg delete "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /f >nul 2>&1
+
+:: Install based on choice
+if "%INSTALL_CHOICE%"=="1" goto FULL_INSTALL
+if "%INSTALL_CHOICE%"=="2" goto COMPRESS_ONLY
+if "%INSTALL_CHOICE%"=="3" goto EXTRACT_ONLY
+
+:FULL_INSTALL
+echo Installing compression menus for .%EXTENSION%...
+
+:: Set menu key based on extension
+if "%EXTENSION%"=="tar.gz" (
+    set "MENU_KEY=AddToTarGz"
+) else (
+    set "MENU_KEY=AddToTgz"
+)
+
+:: Compression for files (exclude existing archives)
+reg add "HKCR\*\shell\%MENU_KEY%" /ve /t REG_SZ /d "%MENU_TEXT%" /f >nul 2>&1
+reg add "HKCR\*\shell\%MENU_KEY%" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\*\shell\%MENU_KEY%" /v "AppliesTo" /t REG_SZ /d "NOT System.FileName:\"*.tar.gz\" AND NOT System.FileName:\"*.tgz\"" /f >nul 2>&1
+reg add "HKCR\*\shell\%MENU_KEY%\command" /ve /t REG_SZ /d "\"%CREATE_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+:: Compression for folders
+reg add "HKCR\Directory\shell\%MENU_KEY%" /ve /t REG_SZ /d "%MENU_TEXT%" /f >nul 2>&1
+reg add "HKCR\Directory\shell\%MENU_KEY%" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\Directory\shell\%MENU_KEY%\command" /ve /t REG_SZ /d "\"%CREATE_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+if "%DLL_INSTALLED%"=="1" goto INSTALL_DONE
+
+:: Only install registry extraction if DLL failed to install
+echo Installing fallback extraction menus (DLL not available)...
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+goto INSTALL_DONE
+
+:COMPRESS_ONLY
+echo Installing compression only for .%EXTENSION%...
+
+:: Set menu key based on extension
+if "%EXTENSION%"=="tar.gz" (
+    set "MENU_KEY=AddToTarGz"
+) else (
+    set "MENU_KEY=AddToTgz"
+)
+
+reg add "HKCR\*\shell\%MENU_KEY%" /ve /t REG_SZ /d "%MENU_TEXT%" /f >nul 2>&1
+reg add "HKCR\*\shell\%MENU_KEY%" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\*\shell\%MENU_KEY%" /v "AppliesTo" /t REG_SZ /d "NOT System.FileName:\"*.tar.gz\" AND NOT System.FileName:\"*.tgz\"" /f >nul 2>&1
+reg add "HKCR\*\shell\%MENU_KEY%\command" /ve /t REG_SZ /d "\"%CREATE_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+reg add "HKCR\Directory\shell\%MENU_KEY%" /ve /t REG_SZ /d "%MENU_TEXT%" /f >nul 2>&1
+reg add "HKCR\Directory\shell\%MENU_KEY%" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\Directory\shell\%MENU_KEY%\command" /ve /t REG_SZ /d "\"%CREATE_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+goto INSTALL_DONE
+
+:EXTRACT_ONLY
+if "%DLL_INSTALLED%"=="1" goto INSTALL_DONE
+
+echo Installing extraction only (using registry fallback)...
+
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /ve /t REG_SZ /d "Extract archive" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /v "Icon" /t REG_SZ /d "%ICON_PATH%" /f >nul 2>&1
+reg add "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz\command" /ve /t REG_SZ /d "\"%EXTRACT_SCRIPT%\" \"%%1\"" /f >nul 2>&1
+
+:INSTALL_DONE
+echo.
+echo =========================================
+echo Installation complete!
+echo =========================================
+echo.
+echo Installed to: %INSTALL_DIR%
+echo Extension: .%EXTENSION%
+echo.
+echo The source folder can now be safely deleted.
+echo To uninstall later, run: %UNINSTALL_SCRIPT%
+echo.
+pause
+exit /b 0
+
+:: Function to create compression script
+:CREATE_COMPRESSION_SCRIPT
+set "output_file=%~1"
+set "extension=%~2"
+
+(
+echo @echo off
+echo setlocal enabledelayedexpansion
+echo.
+echo :: Get input path
+echo set "input=%%~1"
+echo.
+echo :: Check if input exists
+echo if not exist "%%input%%" ^(
+echo     echo ERROR: Path does not exist: %%input%%
+echo     timeout /t 5 /nobreak ^>nul
+echo     exit /b 1
+echo ^)
+echo.
+echo :: Get folder and name
+echo for %%%%I in ^("%%input%%"^) do ^(
+echo     set "folder=%%%%~dpI"
+echo     set "name=%%%%~nI"
+echo     set "fullname=%%%%~nxI"
+echo ^)
+echo.
+echo :: Remove trailing backslash from folder if present
+echo if "%%folder:~-1%%"=="\" set "folder=%%folder:~0,-1%%"
+echo.
+echo :: Determine output filename
+echo if exist "%%input%%\*" ^(
+echo     :: It's a directory
+echo     set "outputname=%%name%%"
+echo ^) else ^(
+echo     :: It's a file
+echo     set "outputname=%%name%%"
+echo ^)
+echo.
+if "%extension%"=="tar.gz" (
+echo :: Set output paths for tar.gz
+echo set "tarfile=%%folder%%\%%outputname%%.tar"
+echo set "targzfile=%%folder%%\%%outputname%%.tar.gz"
+echo.
+echo :: Check if output already exists
+echo if exist "%%targzfile%%" del "%%targzfile%%"
+) else (
+echo :: Set output paths for tgz
+echo set "tarfile=%%folder%%\%%outputname%%.tar"
+echo set "tgzfile=%%folder%%\%%outputname%%.tgz"
+echo.
+echo :: Check if output already exists
+echo if exist "%%tgzfile%%" del "%%tgzfile%%"
+)
+echo.
+echo :: Find 7-Zip
+echo set "sevenzip=%%ProgramFiles%%\7-Zip\7z.exe"
+echo if not exist "%%sevenzip%%" set "sevenzip=%%ProgramFiles^(x86^)%%\7-Zip\7z.exe"
+echo if not exist "%%sevenzip%%" exit /b 1
+echo.
+echo :: Create TAR archive
+echo "%%sevenzip%%" a -ttar "%%tarfile%%" "%%input%%" ^>nul 2^>^&1
+echo if errorlevel 1 exit /b 1
+echo.
+if "%extension%"=="tar.gz" (
+echo :: Compress TAR to TAR.GZ
+echo "%%sevenzip%%" a -tgzip "%%targzfile%%" "%%tarfile%%" -mx9 ^>nul 2^>^&1
+echo if errorlevel 1 ^(
+echo     del "%%tarfile%%" ^>nul 2^>^&1
+echo     exit /b 1
+echo ^)
+) else (
+echo :: Compress TAR to TGZ
+echo "%%sevenzip%%" a -tgzip "%%tgzfile%%" "%%tarfile%%" -mx9 ^>nul 2^>^&1
+echo if errorlevel 1 ^(
+echo     del "%%tarfile%%" ^>nul 2^>^&1
+echo     exit /b 1
+echo ^)
+)
+echo.
+echo :: Clean up intermediate TAR file
+echo del "%%tarfile%%" ^>nul 2^>^&1
+echo.
+echo exit /b 0
+) > "%output_file%"
+
+goto :eof
+
+:: Function to create uninstall script
+:CREATE_UNINSTALL_SCRIPT
+set "output_file=%~1"
+
+(
+echo @echo off
+echo echo =========================================
+echo echo Add to tar.gz - Uninstaller v1.3.0
+echo echo =========================================
+echo echo.
+echo.
+echo :: Check if running silently
+echo set "SILENT=0"
+echo if "%%1"=="silent" set "SILENT=1"
+echo.
+echo :: Check if running as Administrator
+echo net session ^>nul 2^>^&1
+echo if errorlevel 1 ^(
+echo     if "%%SILENT%%"=="0" ^(
+echo         echo ERROR: This uninstaller must be run as Administrator.
+echo         echo Please right-click and select "Run as administrator"
+echo         pause
+echo     ^)
+echo     exit /b 1
+echo ^)
+echo.
+echo if "%%SILENT%%"=="0" echo Running with Administrator privileges... OK
+echo.
+echo :: Unregister DLL if it exists
+echo if exist "%%WINDIR%%\System32\targz_context.dll" ^(
+echo     if "%%SILENT%%"=="0" echo Unregistering DLL...
+echo     regsvr32 /u /s "%%WINDIR%%\System32\targz_context.dll" ^>nul 2^>^&1
+echo     del "%%WINDIR%%\System32\targz_context.dll" ^>nul 2^>^&1
+echo ^)
+echo.
+echo :: Remove DLL registry entries manually
+echo reg delete "HKCR\SystemFileAssociations\.tar.gz\shellex\ContextMenuHandlers\TarGzExtract" /f ^>nul 2^>^&1
+echo reg delete "HKCR\SystemFileAssociations\.tgz\shellex\ContextMenuHandlers\TarGzExtract" /f ^>nul 2^>^&1
+echo.
+echo :: Remove registry entries
+echo if "%%SILENT%%"=="0" echo Removing registry entries...
+echo reg delete "HKCR\*\shell\AddToTarGz" /f ^>nul 2^>^&1
+echo reg delete "HKCR\*\shell\AddToTgz" /f ^>nul 2^>^&1
+echo reg delete "HKCR\Directory\shell\AddToTarGz" /f ^>nul 2^>^&1
+echo reg delete "HKCR\Directory\shell\AddToTgz" /f ^>nul 2^>^&1
+echo reg delete "HKCR\SystemFileAssociations\.tar.gz\shell\ExtractTarGz" /f ^>nul 2^>^&1
+echo reg delete "HKCR\SystemFileAssociations\.tgz\shell\ExtractTarGz" /f ^>nul 2^>^&1
+echo reg delete "HKLM\SOFTWARE\AddToTarGz" /f ^>nul 2^>^&1
+echo.
+echo :: Remove installation directory ^(this script will delete itself^)
+echo if "%%SILENT%%"=="0" ^(
+echo     echo.
+echo     echo Removing installation directory...
+echo     echo %%ProgramData%%\AddToTarGz
+echo     echo.
+echo     timeout /t 3 /nobreak ^>nul
+echo ^)
+echo.
+echo :: Self-delete and cleanup
+echo start /b "" cmd /c del /q "%%ProgramData%%\AddToTarGz\*.*" ^&^& rmdir "%%ProgramData%%\AddToTarGz" ^&^& if "%%SILENT%%"=="0" echo Uninstall complete!
+echo.
+echo exit /b 0
+) > "%output_file%"
+
+goto :eof

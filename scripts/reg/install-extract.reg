@@ -1,0 +1,49 @@
+Windows Registry Editor Version 5.00
+
+; =====================================================
+; Add to tar.gz - Extraction Only
+; Adds only extraction context menu entries
+; =====================================================
+
+; --- Extraction: .tar.gz files ---
+[HKEY_CLASSES_ROOT\.tar.gz]
+@="targzfile"
+
+[HKEY_CLASSES_ROOT\targzfile]
+@="TAR GZ Archive"
+
+[HKEY_CLASSES_ROOT\targzfile\shell\extract]
+@="Extract here"
+"Icon"="ICON_PATH_PLACEHOLDER"
+
+[HKEY_CLASSES_ROOT\targzfile\shell\extract\command]
+@="\"C:\\Path\\To\\scripts\\core\\ExtractTarGz.bat\" \"%1\""
+
+; --- Extraction: .tgz files ---
+[HKEY_CLASSES_ROOT\.tgz]
+@="tgzfile"
+
+[HKEY_CLASSES_ROOT\tgzfile]
+@="TGZ Archive"
+
+[HKEY_CLASSES_ROOT\tgzfile\shell\extract]
+@="Extract here"
+"Icon"="ICON_PATH_PLACEHOLDER"
+
+[HKEY_CLASSES_ROOT\tgzfile\shell\extract\command]
+@="\"C:\\Path\\To\\scripts\\core\\ExtractTarGz.bat\" \"%1\""
+
+; --- Alternative: Add extraction to existing 7-Zip tar.gz handler ---
+[HKEY_CLASSES_ROOT\7-Zip.tar.gz\shell\ExtractHere]
+@="Extract here (tar.gz)"
+"Icon"="ICON_PATH_PLACEHOLDER"
+
+[HKEY_CLASSES_ROOT\7-Zip.tar.gz\shell\ExtractHere\command]
+@="\"C:\\Path\\To\\scripts\\core\\ExtractTarGz.bat\" \"%1\""
+
+[HKEY_CLASSES_ROOT\7-Zip.tgz\shell\ExtractHere]
+@="Extract here (tgz)"
+"Icon"="ICON_PATH_PLACEHOLDER"
+
+[HKEY_CLASSES_ROOT\7-Zip.tgz\shell\ExtractHere\command]
+@="\"C:\\Path\\To\\scripts\\core\\ExtractTarGz.bat\" \"%1\""

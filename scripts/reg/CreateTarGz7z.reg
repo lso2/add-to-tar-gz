@@ -1,0 +1,17 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\*\shell\7zAddToTarGz]
+@="Add to tar.gz"
+"Icon"="ICON_PATH_PLACEHOLDER"
+"Position"="Top"
+
+[HKEY_CLASSES_ROOT\*\shell\7zAddToTarGz\command]
+@="\"C:\\Path\\To\\scripts\\CreateTarGz.bat\" \"%1\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\7zAddToTarGz]
+@="Add to tar.gz"
+"Icon"="ICON_PATH_PLACEHOLDER"
+"Position"="Top"
+
+[HKEY_CLASSES_ROOT\Directory\shell\7zAddToTarGz\command]
+@="\"C:\\Path\\To\\scripts\\CreateTarGz.bat\" \"%1\""

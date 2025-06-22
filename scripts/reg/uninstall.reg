@@ -1,0 +1,23 @@
+Windows Registry Editor Version 5.00
+
+; =====================================================
+; Add to tar.gz - Uninstaller
+; Removes all context menu entries
+; =====================================================
+
+; --- Remove Compression entries ---
+[-HKEY_CLASSES_ROOT\*\shell\AddToTarGz]
+[-HKEY_CLASSES_ROOT\Directory\shell\AddToTarGz]
+
+; --- Remove old 7z entries (if they exist) ---
+[-HKEY_CLASSES_ROOT\*\shell\7zAddToTarGz]
+[-HKEY_CLASSES_ROOT\Directory\shell\7zAddToTarGz]
+
+; --- Remove Extraction entries ---
+[-HKEY_CLASSES_ROOT\targzfile\shell\extract]
+[-HKEY_CLASSES_ROOT\tgzfile\shell\extract]
+[-HKEY_CLASSES_ROOT\7-Zip.tar.gz\shell\ExtractHere]
+[-HKEY_CLASSES_ROOT\7-Zip.tgz\shell\ExtractHere]
+
+; Note: We don't remove the file associations themselves
+; as other programs might use them
