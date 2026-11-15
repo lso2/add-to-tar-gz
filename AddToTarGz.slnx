@@ -1,0 +1,10 @@
+<!-- AddToTarGz.slnx: Visual Studio solution with the worker exe, the context menu DLL and the tray app.
+     Doc: docs/notes/AddToTarGz.slnx.md -->
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="src/worker/AddToTarGz.vcxproj" Id="22bc43f8-1e04-43e8-85e7-3fb77ae5afc3" />
+  <Project Path="src/menu/targz_context.vcxproj" Id="68f8d003-2730-49b9-a7d1-ebf6561902a4" />
+  <Project Path="src/tray/AddToTarGzTray.vcxproj" Id="9dd0b1d4-d735-4c0e-9fab-0ecd72431959" />
+</Solution>

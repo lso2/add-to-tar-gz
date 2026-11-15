@@ -1,0 +1,36 @@
+// worker.rc: resources of AddToTarGz.exe: the tgz icon and the version information.
+// Globals: none. Doc: docs/notes/src/worker/worker.rc.md
+#include <windows.h>
+#include "resource_ids.h"
+#include "version.h"
+
+IDI_TGZ ICON "tgz.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION ATG_VERSION_MAJOR, ATG_VERSION_MINOR, ATG_VERSION_PATCH, 0
+PRODUCTVERSION ATG_VERSION_MAJOR, ATG_VERSION_MINOR, ATG_VERSION_PATCH, 0
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS 0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "PlexPixel"
+            VALUE "FileDescription", "AddToTarGz"
+            VALUE "FileVersion", ATG_VERSION_STRING
+            VALUE "InternalName", "AddToTarGz"
+            VALUE "LegalCopyright", "Copyright (C) 2025-2026 PlexPixel. GPLv3."
+            VALUE "OriginalFilename", "AddToTarGz.exe"
+            VALUE "ProductName", "AddToTarGz"
+            VALUE "ProductVersion", ATG_VERSION_STRING
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

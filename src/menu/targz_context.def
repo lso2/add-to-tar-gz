@@ -1,0 +1,6 @@
+; targz_context.def: exports of the context menu DLL that COM calls.
+; Doc: docs/notes/src/menu/targz_context.def.md
+LIBRARY targz_context
+EXPORTS
+    DllCanUnloadNow PRIVATE
+    DllGetClassObject PRIVATE

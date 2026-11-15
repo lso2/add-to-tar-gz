@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AddToTarGzTray.vcxproj: builds AddToTarGzTray.exe, the tray icon and the Settings window.
+     The ClCompile list is the manifest of the tray build. Output: bin\x64\Release\AddToTarGzTray.exe.
+     Doc: docs/notes/src/tray/AddToTarGzTray.vcxproj.md -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <ProjectGuid>{9DD0B1D4-D735-4C0E-9FAB-0ECD72431959}</ProjectGuid>
+    <RootNamespace>AddToTarGzTray</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseDebugLibraries Condition="'$(Configuration)'=='Debug'">true</UseDebugLibraries>
+    <UseDebugLibraries Condition="'$(Configuration)'=='Release'">false</UseDebugLibraries>
+    <WholeProgramOptimization Condition="'$(Configuration)'=='Release'">true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OutDir>$(MSBuildThisFileDirectory)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)..\..\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>AddToTarGzTray</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;NOMINMAX;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\shared;$(MSBuildThisFileDirectory)..\..\icon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="Exists('$(MSBuildThisFileDirectory)..\..\icon\github-mark.png')">ATG_HAS_GITHUB_MARK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>comctl32.lib;shcore.lib;winhttp.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="tray_window.cpp" />
+    <ClCompile Include="tray_icon.cpp" />
+    <ClCompile Include="tray_menu.cpp" />
+    <ClCompile Include="settings_dialog.cpp" />
+    <ClCompile Include="settings_footer.cpp" />
+    <ClCompile Include="coffee_icon.cpp" />
+    <ClCompile Include="github_mark.cpp" />
+    <ClCompile Include="web_link.cpp" />
+    <ClCompile Include="update_check.cpp" />
+    <ClCompile Include="github_release.cpp" />
+    <ClCompile Include="release_version.cpp" />
+    <ClCompile Include="json_reader.cpp" />
+    <ClCompile Include="autostart.cpp" />
+    <ClCompile Include="old_builds.cpp" />
+    <ClCompile Include="..\shared\settings.cpp" />
+    <ClCompile Include="..\shared\names.cpp" />
+    <ClCompile Include="..\shared\paths.cpp" />
+    <ClCompile Include="..\shared\errors.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tray_ids.h" />
+    <ClInclude Include="tray_window.h" />
+    <ClInclude Include="tray_icon.h" />
+    <ClInclude Include="tray_menu.h" />
+    <ClInclude Include="settings_dialog.h" />
+    <ClInclude Include="settings_footer.h" />
+    <ClInclude Include="coffee_icon.h" />
+    <ClInclude Include="github_mark.h" />
+    <ClInclude Include="web_link.h" />
+    <ClInclude Include="links.h" />
+    <ClInclude Include="update_check.h" />
+    <ClInclude Include="update_result.h" />
+    <ClInclude Include="github_release.h" />
+    <ClInclude Include="release_version.h" />
+    <ClInclude Include="json_reader.h" />
+    <ClInclude Include="autostart.h" />
+    <ClInclude Include="old_builds.h" />
+    <ClInclude Include="..\shared\settings.h" />
+    <ClInclude Include="..\shared\names.h" />
+    <ClInclude Include="..\shared\paths.h" />
+    <ClInclude Include="..\shared\errors.h" />
+    <ClInclude Include="..\shared\version.h" />
+    <ClInclude Include="..\shared\resource_ids.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tray.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="tray.manifest" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

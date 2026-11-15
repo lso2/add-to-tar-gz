@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AddToTarGz.vcxproj: builds AddToTarGz.exe, the worker that runs 7-Zip for the add and extract menu items.
+     The ClCompile list is the manifest of the worker build. Output: bin\x64\Release\AddToTarGz.exe, with
+     third_party\7-Zip\7za.exe copied beside it.
+     Doc: docs/notes/src/worker/AddToTarGz.vcxproj.md -->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <ProjectGuid>{22BC43F8-1E04-43E8-85E7-3FB77AE5AFC3}</ProjectGuid>
+    <RootNamespace>AddToTarGz</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseDebugLibraries Condition="'$(Configuration)'=='Debug'">true</UseDebugLibraries>
+    <UseDebugLibraries Condition="'$(Configuration)'=='Release'">false</UseDebugLibraries>
+    <WholeProgramOptimization Condition="'$(Configuration)'=='Release'">true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OutDir>$(MSBuildThisFileDirectory)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)..\..\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>AddToTarGz</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;NOMINMAX;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\shared;$(MSBuildThisFileDirectory)..\..\icon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="args.cpp" />
+    <ClCompile Include="sevenzip.cpp" />
+    <ClCompile Include="child.cpp" />
+    <ClCompile Include="pipes.cpp" />
+    <ClCompile Include="stages.cpp" />
+    <ClCompile Include="progress.cpp" />
+    <ClCompile Include="progress_window.cpp" />
+    <ClCompile Include="fs_ops.cpp" />
+    <ClCompile Include="add_job.cpp" />
+    <ClCompile Include="extract_job.cpp" />
+    <ClCompile Include="folder_picker.cpp" />
+    <ClCompile Include="report.cpp" />
+    <ClCompile Include="..\shared\names.cpp" />
+    <ClCompile Include="..\shared\paths.cpp" />
+    <ClCompile Include="..\shared\cmdline.cpp" />
+    <ClCompile Include="..\shared\errors.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="args.h" />
+    <ClInclude Include="sevenzip.h" />
+    <ClInclude Include="child.h" />
+    <ClInclude Include="pipes.h" />
+    <ClInclude Include="stages.h" />
+    <ClInclude Include="progress.h" />
+    <ClInclude Include="progress_window.h" />
+    <ClInclude Include="fs_ops.h" />
+    <ClInclude Include="job_result.h" />
+    <ClInclude Include="add_job.h" />
+    <ClInclude Include="extract_job.h" />
+    <ClInclude Include="folder_picker.h" />
+    <ClInclude Include="report.h" />
+    <ClInclude Include="..\shared\names.h" />
+    <ClInclude Include="..\shared\paths.h" />
+    <ClInclude Include="..\shared\cmdline.h" />
+    <ClInclude Include="..\shared\errors.h" />
+    <ClInclude Include="..\shared\version.h" />
+    <ClInclude Include="..\shared\resource_ids.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="worker.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="worker.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\third_party\7-Zip\7za.exe">
+      <DestinationFolders>$(OutDir)</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

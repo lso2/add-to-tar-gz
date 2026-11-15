@@ -1,0 +1,7 @@
+# .gitignore: build output and editor state excluded from the repository.
+# Doc: docs/notes/.gitignore.md
+bin/
+obj/
+Output/
+.vs/
+*.user
